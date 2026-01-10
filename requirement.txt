@@ -1,0 +1,15 @@
+# Core Data Science Stack
+pandas
+numpy
+matplotlib
+seaborn
+
+# Machine Learning & Modeling
+scikit-learn
+xgboost
+lightgbm
+shap
+
+# Project Utilities
+python-dotenv
+ipykernel
