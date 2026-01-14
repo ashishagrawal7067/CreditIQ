@@ -222,3 +222,4 @@ data/
 *.csv
 *.gz
 *.zip
+*.parquet
