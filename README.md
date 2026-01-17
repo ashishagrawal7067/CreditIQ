@@ -28,7 +28,7 @@ or absorb losses on bad ones (too permissive). This project addresses that probl
 **Period:** 2007 – 2018  
 **Features:** 141 raw features covering borrower profile, credit history, loan terms, and repayment behaviour  
 
-> Raw data files are not committed to this repository. Download from the link above 
+> Raw data files are not committed to this repository. Download [here](https://www.kaggle.com/datasets/wordsforthewise/lending-club?resource=download) 
 > and place in `data/`.
 
 ---
