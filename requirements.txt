@@ -3,6 +3,7 @@ pandas
 numpy
 matplotlib
 seaborn
+pyarrow
 
 # Machine Learning & Modeling
 scikit-learn
