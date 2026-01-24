@@ -66,7 +66,40 @@ or absorb losses on bad ones (too permissive). This project addresses that probl
 
 ## Key Results
 
-*To be updated as notebooks are completed.*
+### Model Performance
+| Model | AUC-ROC | Gini Coefficient | PR-AUC |
+|-------|---------|-----------------|--------|
+| Logistic Regression (baseline) | 0.7081 | 0.4163 | 0.3692 |
+| Random Forest | 0.7115 | 0.4230 | 0.3758 |
+| **XGBoost (selected)** | **0.7213** | **0.4426** | **0.3903** |
+
+> Gini Coefficient is the primary evaluation metric, the industry standard 
+> in consumer credit risk. A Gini of 0 = random; 1.0 = perfect. 
+> Industry models typically achieve 0.40–0.65.
+
+### What Drives Default Risk
+Based on SHAP value analysis, the five most influential signals at loan origination are:
+
+1. **Interest rate**: higher rate loans carry significantly more default risk
+2. **Loan term**: 60-month loans default at nearly twice the rate of 36-month loans
+3. **Loan grade**: Lending Club's own grading system carries strong signal
+4. **FICO score**: lower scores at origination independently predict default
+5. **Loan-to-income ratio**: affordability is a primary driver of repayment behaviour
+
+### Business Simulation
+Simulating two lending strategies on a 269,062-loan held-out test set:
+
+| Strategy | Return Rate | On a $1B Portfolio |
+|----------|------------|-------------------|
+| Approve All (baseline) | 16.27% | $162.7M net return |
+| **Model-Gated (threshold = 35%)** | **18.06%** | **$180.6M net return** |
+
+**The model generates $17.9M in additional value per $1B deployed** — by 
+declining the highest-risk 68.5% of applications while reducing the realised 
+default rate from 19.96% to 7.14%.
+
+> Assumptions: interest revenue = rate × principal × term; 
+> LGD = 100% (no recovery); no cost of capital modelled.
 
 ---
 
