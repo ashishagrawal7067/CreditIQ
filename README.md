@@ -117,6 +117,50 @@ default rate from 19.96% to 7.14%.
 > Assumptions: interest revenue = rate × principal × term;
 > LGD = 100% (no recovery); no cost of capital modelled.
 ---
+## Limitations & Future Work
+
+### Current Limitations
+
+**Survivorship bias / Reject Inference**
+This model trains exclusively on approved loans — borrowers Lending Club 
+chose to lend to. We have no outcome data for declined applicants. In 
+production, a lender's true population includes declined borrowers, whose 
+risk profile may differ systematically from approved ones. Techniques such 
+as augmentation, parcelling, or fuzzy augmentation would be required to 
+correct for this bias.
+
+
+**Loss Given Default (LGD) assumption**
+The business simulation assumes 100% loss on defaulted loans — no recovery. 
+In practice, Lending Club recovers approximately 30–40 cents on the dollar 
+through collections. A full expected loss model would incorporate:
+`Expected Loss = Probability of Default × Exposure at Default × Loss Given Default`
+
+**Concept drift**
+Temporal validation revealed Gini degradation from 0.4426 to 0.3972 between 
+the training window and 2018 loans. The model requires quarterly retraining 
+on a rolling 36-month window to maintain production performance.
+
+### Future Work
+
+**Survival Analysis**
+Replace binary default prediction with a time-to-default model using Cox 
+Proportional Hazards regression. This provides richer output — not just 
+*whether* a borrower will default, but *when* — enabling more precise 
+loan pricing and loss provisioning.
+
+**Full Expected Loss Framework**
+Build separate models for Probability of Default (PD), Loss Given Default 
+(LGD), and Exposure at Default (EAD) — the three components of Basel III 
+credit risk capital requirements. This is the framework used by regulated 
+lending institutions.
+
+**Model Monitoring Pipeline**
+Build an automated monitoring script that scores a rolling holdout monthly, 
+tracks Gini over time, and triggers a retraining alert if performance 
+degrades beyond 3 percentage points.
+
+---
 
 ## Setup
 

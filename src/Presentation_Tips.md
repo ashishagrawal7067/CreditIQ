@@ -17,10 +17,10 @@ Two reasons. First, XGBoost trained in 93 seconds versus Random Forest's 452 sec
 
 5. **What would you do differently if you had more time?**
 
-Three things. First, hyperparameter tuning with Optuna — we used sensible defaults but a proper search would likely add 2–4 Gini points. Second, survival analysis — instead of binary default prediction, model time to default using Cox regression, which gives richer information for loan pricing. Third, reject inference — our model only trains on approved loans, but a real lender needs to estimate default risk for declined applicants too, which requires specialised techniques like augmentation or parcelling.
+Three things. First, survival analysis — instead of binary default prediction, model time to default using Cox regression, which gives richer information for loan pricing. Second, reject inference — our model only trains on approved loans, but a real lender needs to estimate default risk for declined applicants too, which requires specialised techniques like augmentation or parcelling.
 
 6. **How would you put this model into production?**
 
 The XGBoost model is serialised with joblib and can be wrapped in a FastAPI endpoint that accepts loan application features and returns a default probability in milliseconds. The credit scorecard from notebook 04 provides a parallel interpretable output for regulatory compliance. I'd retrain monthly on new originations, monitor Gini on a rolling holdout, and alert if it drops more than 3 points — that's a standard model governance threshold.
 
->That's the complete project. You have four notebooks, 15 charts, two saved models, a credit scorecard, a business simulation with a boardroom-ready headline number, and a professional README. Push the final commit and you're done.
+>The complete project: We have four notebooks, 15 charts, two saved models, a credit scorecard, a business simulation with a boardroom-ready headline number, and a professional README.
