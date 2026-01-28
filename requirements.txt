@@ -10,7 +10,11 @@ scikit-learn
 xgboost
 lightgbm
 shap
+pip freeze
 
 # Project Utilities
 python-dotenv
 ipykernel
+
+#App
+streamlit
