@@ -1,13 +1,15 @@
 # ── Data & Models (Mechanical Necessity for Data Science) ──────────────────
 # We ignore these because they are too large for GitHub
 data/
-models/*.joblib
-models/*.pkl
-models/*.json
 *.csv
 *.gz
 *.zip
 *.parquet
+
+models/
+*.joblib
+*.pkl
+*.json
 
 # ── Python Environment & Distribution ───────────────────────────────────────
 venv/

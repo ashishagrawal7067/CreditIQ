@@ -21,6 +21,6 @@ Three things. First, survival analysis — instead of binary default prediction,
 
 6. **How would you put this model into production?**
 
-The XGBoost model is serialised with joblib and can be wrapped in a FastAPI endpoint that accepts loan application features and returns a default probability in milliseconds. The credit scorecard from notebook 04 provides a parallel interpretable output for regulatory compliance. I'd retrain monthly on new originations, monitor Gini on a rolling holdout, and alert if it drops more than 3 points — that's a standard model governance threshold.
+The XGBoost model is serialised with joblib and can be wrapped in a FastAPI endpoint that accepts loan application features and returns a default probability in milliseconds. The credit scorecard from notebook 04 provides a parallel interpretable output for regulatory compliance. I'd retrain monthly on new originations, monitor Gini on a rolling holdout, and alert if it drops more than 3 points — that's a standard model governance threshold. I know right?
 
 >The complete project: We have four notebooks, 15 charts, two saved models, a credit scorecard, a business simulation with a boardroom-ready headline number, and a professional README.
