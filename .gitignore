@@ -6,6 +6,7 @@ data/
 *.zip
 *.parquet
 
+# ── Models — Too large for GitHub ──────────────────────────────────────────
 models/
 *.joblib
 *.pkl
