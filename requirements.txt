@@ -1,20 +1,23 @@
-# Core Data Science Stack
+# ── Core Data Stack ─────────────────────────────────────────────────────────
 pandas
 numpy
-matplotlib
-seaborn
 pyarrow
 
-# Machine Learning & Modeling
+# ── Visualization ───────────────────────────────────────────────────────────
+matplotlib
+seaborn
+plotly
+
+# ── Machine Learning & Modeling ─────────────────────────────────────────────
 scikit-learn
 xgboost
 lightgbm
 shap
-pip freeze
+imbalanced-learn
+optuna
 
-# Project Utilities
+# ── Deployment & Utilities ──────────────────────────────────────────────────
+streamlit
+joblib
 python-dotenv
 ipykernel
-
-#App
-streamlit
