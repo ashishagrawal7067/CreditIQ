@@ -1,6 +1,7 @@
 # ── Data & Models (Mechanical Necessity for Data Science) ──────────────────
 # We ignore these because they are too large for GitHub
-data/
+data/*
+!data/README.md
 *.csv
 *.gz
 *.zip

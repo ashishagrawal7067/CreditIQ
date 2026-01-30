@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import joblib
+import os
 
 # ── Page config ────────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -190,9 +191,21 @@ st.markdown("""
 # ── Load model ─────────────────────────────────────────────────────────────────
 @st.cache_resource
 def load_model():
-    return joblib.load("models/xgb_model.pkl")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(base_dir, "models", "xgb_model.pkl"),
+        os.path.join(base_dir, "..", "models", "xgb_model.pkl"),
+        "models/xgb_model.pkl",
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            return joblib.load(path)
+    return None
 
 model = load_model()
+if model is None:
+    st.error("⚠️ Model file `models/xgb_model.pkl` could not be found. Please ensure the model file is present in the `models/` directory.")
+    st.stop()
 
 # ── Feature names in exact training order ──────────────────────────────────────
 FEATURE_NAMES = [
@@ -217,9 +230,16 @@ st.sidebar.markdown("""
 <div style='text-align:center; padding: 16px 0 8px 0;'>
     <div style='font-size:2.2em;'>🏦</div>
     <div style='font-size:1.1em; font-weight:800; color:#a0c4ff; 
-                letter-spacing:0.06em;'>LOAN SCORER</div>
+                letter-spacing:0.06em;'>CREDITIQ</div>
     <div style='font-size:0.75em; color:rgba(255,255,255,0.45); 
                 margin-top:4px;'>Credit Risk Engine v1.0</div>
+    <div style='margin-top:8px;'>
+        <a href='https://github.com/ashishagrawal7067/CreditIQ' target='_blank' 
+           style='color:#a0c4ff; text-decoration:none; font-size:0.8em; font-weight:600;
+                  background:rgba(255,255,255,0.08); padding:4px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); display:inline-block;'>
+           ★ GitHub: CreditIQ
+        </a>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -256,19 +276,29 @@ pub_rec           = st.sidebar.slider("Public Records", 0, 5, 0)
 open_acc          = st.sidebar.slider("Open Credit Accounts", 1, 40, 8)
 total_acc         = st.sidebar.slider("Total Credit Accounts", 1, 80, 20)
 revol_bal         = st.sidebar.slider("Revolving Balance ($)", 0, 100000, 15000, 500)
-installment       = loan_amnt / term_months
+
+# Calculate exact amortized monthly installment including interest rate
+monthly_r = (int_rate / 100.0) / 12.0
+if monthly_r > 0:
+    installment = loan_amnt * (monthly_r * ((1.0 + monthly_r) ** term_months)) / (((1.0 + monthly_r) ** term_months) - 1.0)
+else:
+    installment = loan_amnt / term_months
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FEATURE ENGINEERING
 # ══════════════════════════════════════════════════════════════════════════════
-monthly_inc          = annual_inc / 12
-loan_to_income       = loan_amnt / annual_inc
-instalment_to_income = installment / monthly_inc if monthly_inc > 0 else 0
+monthly_inc          = annual_inc / 12.0
+loan_to_income       = loan_amnt / annual_inc if annual_inc > 0 else 0.0
+instalment_to_income = installment / monthly_inc if monthly_inc > 0 else 0.0
 delinq_flag          = 1 if delinq_2yrs > 0 else 0
 pub_rec_flag         = 1 if pub_rec > 0 else 0
 grade_avg_rates      = {"A": 7.49, "B": 11.72, "C": 15.25,
-                         "D": 19.47, "E": 23.38, "F": 27.13, "G": 29.08}
+                        "D": 19.47, "E": 23.38, "F": 27.13, "G": 29.08}
 int_rate_grade_dev   = int_rate - grade_avg_rates.get(grade, 13.0)
+
+# Clip extreme ratios to the 99th percentile caps used during training (notebook 02)
+loan_to_income_model       = min(loan_to_income, 0.50)
+instalment_to_income_model = min(instalment_to_income, 0.1994)
 
 def build_feature_vector():
     row = {col: 0 for col in FEATURE_NAMES}
@@ -278,8 +308,8 @@ def build_feature_vector():
         'dti': dti, 'fico_mid': fico_score, 'revol_util': revol_util,
         'open_acc': open_acc, 'delinq_2yrs': delinq_2yrs, 'pub_rec': pub_rec,
         'revol_bal': revol_bal, 'total_acc': total_acc,
-        'credit_age_months': credit_age_months, 'loan_to_income': loan_to_income,
-        'instalment_to_income': instalment_to_income, 'delinq_flag': delinq_flag,
+        'credit_age_months': credit_age_months, 'loan_to_income': loan_to_income_model,
+        'instalment_to_income': instalment_to_income_model, 'delinq_flag': delinq_flag,
         'pub_rec_flag': pub_rec_flag, 'term_months': term_months,
         'int_rate_grade_dev': int_rate_grade_dev,
     })
@@ -394,8 +424,8 @@ with col_gauge:
     ax.set_ylim(-0.65, 1.15)
     ax.axis('off')
     plt.tight_layout(pad=0)
-    st.pyplot(fig, transparent=True)
-    plt.close()
+    st.pyplot(fig)
+    plt.close(fig)
 
 # Decision panel
 with col_mid:
@@ -478,8 +508,8 @@ with col_signals:
         ax_bar.barh(0, norm, color=clr, height=1)
         ax_bar.set_xlim(0, 1)
         ax_bar.axis('off')
-        st.pyplot(fig_bar, transparent=True, use_container_width=True)
-        plt.close()
+        st.pyplot(fig_bar)
+        plt.close(fig_bar)
 
 st.markdown("---")
 
@@ -512,6 +542,7 @@ bars1 = axes3[0].bar(grades,
                       edgecolor=(1,1,1,0.1), linewidth=0.5)
 axes3[0].axhline(default_prob, color='#c77dff', linestyle='--',
                   linewidth=2, label=f'This loan ({default_pct:.1f}%)')
+axes3[0].set_ylim(0, max(0.58, default_prob * 1.15))
 axes3[0].yaxis.set_major_formatter(mticker.PercentFormatter(xmax=1))
 axes3[0].set_title("Default Rate by Grade", fontweight='700')
 axes3[0].set_xlabel("Grade")
@@ -569,8 +600,8 @@ axes3[2].grid(True, alpha=0.1, color='white')
 style_ax(axes3[2])
 
 plt.tight_layout()
-st.pyplot(fig3, transparent=False)
-plt.close()
+st.pyplot(fig3)
+plt.close(fig3)
 
 st.markdown("---")
 
@@ -646,10 +677,10 @@ st.markdown("---")
 # ── Footer ─────────────────────────────────────────────────────────────────────
 st.markdown(
     "<div class='footer'>"
-    "🏦 Lending Club Credit Risk Analyser &nbsp;·&nbsp; "
+    "🏦 <strong>CreditIQ Risk Analyser</strong> &nbsp;·&nbsp; "
     "XGBoost · 1.3M+ Loans · Gini 0.4426 &nbsp;·&nbsp; "
-    "Business Simulation: +$17.9M per $1B deployed &nbsp;·&nbsp; "
-    "Portfolio project — not financial advice"
+    "<a href='https://github.com/ashishagrawal7067/CreditIQ' target='_blank' style='color:#a0c4ff; text-decoration:none; font-weight:600;'>GitHub: ashishagrawal7067/CreditIQ</a> &nbsp;·&nbsp; "
+    "Business Simulation: +$17.9M per $1B deployed"
     "</div>",
     unsafe_allow_html=True
 )

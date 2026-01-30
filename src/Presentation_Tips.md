@@ -23,4 +23,4 @@ Three things. First, survival analysis — instead of binary default prediction,
 
 The XGBoost model is serialised with joblib and can be wrapped in a FastAPI endpoint that accepts loan application features and returns a default probability in milliseconds. The credit scorecard from notebook 04 provides a parallel interpretable output for regulatory compliance. I'd retrain monthly on new originations, monitor Gini on a rolling holdout, and alert if it drops more than 3 points — that's a standard model governance threshold.
 
->The complete project: We have four notebooks, 15 charts, two saved models, a credit scorecard, a business simulation with a boardroom-ready headline number, and a professional README.
+>The complete project: We have six notebooks, 17 publication-grade charts, three trained models (baseline XGBoost, tuned XGBoost, and Logistic Regression), a regulatory credit scorecard, an out-of-time temporal stability analysis, a $1B portfolio business simulation with a boardroom-ready headline number, and a live Streamlit web application.
